@@ -9,9 +9,12 @@ import SwiftUI
 
 @main
 struct KalaidoApp: App {
+    @StateObject private var navigationCoordinator = NavigationCoordinator()
+    
     var body: some Scene {
         WindowGroup {
             WelcomeView()
+                .environmentObject(navigationCoordinator)
         }
     }
 }

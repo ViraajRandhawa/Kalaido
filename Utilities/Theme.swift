@@ -8,6 +8,17 @@
 import SwiftUI
 
 /// Kalaido Design System
+///
+/// **Design Intent: Light Mode Only**
+/// This app intentionally uses a fixed light color palette to maintain
+/// the warm, emotionally inviting aesthetic central to the storytelling
+/// experience. The cream and earth tones create a consistent "reading by
+/// candlelight" feel that would be lost in dark mode.
+///
+/// For accessibility, we rely on:
+/// - High contrast ratios (WCAG AA compliant)
+/// - Dynamic Type support
+/// - VoiceOver optimization
 enum KalaidoTheme {
     
     // MARK: - Colors

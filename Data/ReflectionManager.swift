@@ -8,6 +8,13 @@
 import SwiftUI
 
 /// Manages the persistence and retrieval of user reflections and completed stories
+///
+/// **Scaling Note:**
+/// UserDefaults is appropriate for the student challenge scope (<100 reflections expected).
+/// For production with 1000+ reflections:
+/// - Migrate to file-based JSON storage or Core Data
+/// - UserDefaults has ~4MB practical limit per app
+/// - Each reflection is ~500 bytes, so ~8000 reflections before optimization is needed
 @MainActor
 class ReflectionManager: ObservableObject {
     @Published var reflections: [ReflectionEntry] = []

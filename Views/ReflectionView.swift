@@ -10,6 +10,7 @@ import SwiftUI
 /// Reflection screen shown after completing a story
 struct ReflectionView: View {
     let story: Story
+    @EnvironmentObject var coordinator: NavigationCoordinator
     @EnvironmentObject var manager: ReflectionManager
     @Environment(\.dismiss) var dismiss
     
@@ -187,15 +188,15 @@ struct ReflectionView: View {
         didSave.toggle()
         
         // Return to previous screen
-        dismiss()
+        coordinator.pop()
     }
     
     // MARK: - Return Home Button
     
     private var returnHomeButton: some View {
         Button(action: {
-            // Pop back to choose moment view
-            dismiss()
+            // Pop back to root (ChooseMoment is the first view in the NavStack after Welcome)
+            coordinator.popToRoot()
         }) {
             Text("Read Another Story")
                 .font(.system(size: 16, weight: .medium))
@@ -259,5 +260,6 @@ struct ReflectionView: View {
     NavigationStack {
         ReflectionView(story: StoryData.celebrationStory)
     }
+    .environmentObject(NavigationCoordinator())
     .environmentObject(ReflectionManager())
 }

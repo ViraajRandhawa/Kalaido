@@ -9,7 +9,7 @@ import SwiftUI
 
 /// Screen where users choose a cultural story to read
 struct ChooseMomentView: View {
-    @Binding var navigationPath: NavigationPath
+    @EnvironmentObject var coordinator: NavigationCoordinator
     @State private var showSidebar = false
     
     var body: some View {
@@ -37,14 +37,33 @@ struct ChooseMomentView: View {
                                 .padding(.top, 20)
                                 .padding(.bottom, 32)
                                 
-                                // Moment cards - using extracted StoryData
-                                VStack(spacing: 16) {
-                                    ForEach(StoryData.allStories, id: \.title) { story in
-                                        MomentCard(story: story)
+                                // Moment cards or empty state
+                                if StoryData.allStories.isEmpty {
+                                    VStack(spacing: 16) {
+                                        Image(systemName: "exclamationmark.triangle")
+                                            .font(.system(size: 48))
+                                            .foregroundColor(KalaidoTheme.Colors.textTertiary)
+                                        
+                                        Text("Unable to Load Stories")
+                                            .font(.system(size: 20, weight: .semibold))
+                                            .foregroundColor(KalaidoTheme.Colors.textPrimary)
+                                        
+                                        Text("Please check your app installation or try again.")
+                                            .font(.system(size: 16))
+                                            .foregroundColor(KalaidoTheme.Colors.textSecondary)
+                                            .multilineTextAlignment(.center)
+                                            .padding(.horizontal, 40)
                                     }
+                                    .padding(.top, 60)
+                                } else {
+                                    VStack(spacing: 16) {
+                                        ForEach(StoryData.allStories, id: \.title) { story in
+                                            MomentCard(story: story)
+                                        }
+                                    }
+                                    .padding(.horizontal, 24)
+                                    .padding(.bottom, 32)
                                 }
-                                .padding(.horizontal, 24)
-                                .padding(.bottom, 32)
                             }
                         }
                     }
@@ -85,7 +104,8 @@ struct ChooseMomentView: View {
 
 #Preview {
     NavigationStack {
-        ChooseMomentView(navigationPath: .constant(NavigationPath()))
+        ChooseMomentView()
     }
+    .environmentObject(NavigationCoordinator())
     .environmentObject(ReflectionManager())
 }

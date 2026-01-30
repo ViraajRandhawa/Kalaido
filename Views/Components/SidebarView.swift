@@ -59,7 +59,7 @@ struct SidebarView: View {
                     .accessibilityLabel("App version 1.0")
             }
             .padding(.horizontal, 24)
-            .frame(width: 280)
+            .frame(width: min(UIScreen.main.bounds.width * 0.75, 300))
             .background(KalaidoTheme.Colors.sidebarBackground)
             .ignoresSafeArea()
             

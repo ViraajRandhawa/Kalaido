@@ -13,6 +13,7 @@ struct StoryReaderView: View {
     @State private var currentPage = 0
     @State private var showReflection = false
     @State private var dragOffset: CGFloat = 0
+    @EnvironmentObject var coordinator: NavigationCoordinator
     @Environment(\.dismiss) var dismiss
     
     var body: some View {
@@ -96,9 +97,6 @@ struct StoryReaderView: View {
             }
         }
         .navigationBarTitleDisplayMode(.inline)
-        .navigationDestination(isPresented: $showReflection) {
-            ReflectionView(story: story)
-        }
         // Page turn haptics (iOS 17+)
         .sensoryFeedback(.selection, trigger: currentPage)
     }
@@ -180,7 +178,7 @@ struct StoryReaderView: View {
                         withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
                             dragOffset = 0
                         }
-                        showReflection = true
+                        coordinator.push(.reflection(story))
                     }
                 } else if gesture.translation.width > swipeThreshold && currentPage > 0 {
                     // Swipe right - go to previous page
@@ -213,7 +211,7 @@ struct StoryReaderView: View {
                 currentPage += 1
             }
         } else {
-            showReflection = true
+            coordinator.push(.reflection(story))
         }
     }
 }
@@ -224,5 +222,5 @@ struct StoryReaderView: View {
     NavigationStack {
         StoryReaderView(story: StoryData.celebrationStory)
     }
+    .environmentObject(NavigationCoordinator())
 }
-

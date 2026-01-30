@@ -9,13 +9,13 @@ import SwiftUI
 
 /// The main welcome/landing screen of the app
 struct WelcomeView: View {
-    @State private var navigationPath = NavigationPath()
+    @EnvironmentObject var coordinator: NavigationCoordinator
     @StateObject private var reflectionManager = ReflectionManager()
     @AppStorage("hasSeenOnboarding") private var hasSeenOnboarding = false
     @State private var showOnboarding = false
     
     var body: some View {
-        NavigationStack(path: $navigationPath) {
+        NavigationStack(path: $coordinator.path) {
             ZStack {
                 // Background gradient
                 KalaidoTheme.backgroundGradient
@@ -58,12 +58,13 @@ struct WelcomeView: View {
                     
                     // Begin button
                     Button(action: {
-                        navigationPath.append(NavigationDestination.chooseMoment)
+                        coordinator.push(.chooseMoment)
                     }) {
                         Text("Begin")
                             .font(.system(size: 18, weight: .medium))
                             .foregroundColor(.white)
-                            .frame(width: 140, height: 50)
+                            .frame(minWidth: 140, maxWidth: 200)
+                            .frame(height: 50)
                             .background(KalaidoTheme.Colors.accent)
                             .cornerRadius(KalaidoTheme.CornerRadius.pill)
                     }
@@ -79,10 +80,14 @@ struct WelcomeView: View {
                     Spacer()
                 }
             }
-            .navigationDestination(for: NavigationDestination.self) { destination in
-                switch destination {
+            .navigationDestination(for: Route.self) { route in
+                switch route {
                 case .chooseMoment:
-                    ChooseMomentView(navigationPath: $navigationPath)
+                    ChooseMomentView()
+                case .storyReader(let story):
+                    StoryReaderView(story: story)
+                case .reflection(let story):
+                    ReflectionView(story: story)
                 }
             }
         }
@@ -99,11 +104,7 @@ struct WelcomeView: View {
     }
 }
 
-// MARK: - Navigation Destinations
-
-enum NavigationDestination: Hashable {
-    case chooseMoment
-}
+// MARK: - Navigation Destinations (Removed in favor of Route enum in NavigationCoordinator.swift)
 
 // MARK: - Preview
 

@@ -8,13 +8,18 @@
 import SwiftUI
 
 /// Represents a cultural story with its content and metadata
-struct Story {
+struct Story: Codable, Hashable {
     let title: String
     let country: String
     let paragraphs: [String]
     let images: [String] // SF Symbol names
-    let gradient: [Color]
+    let storableGradient: [StorableColor]
     let culturalContext: String
+    
+    /// Computed colors from storable format
+    var colors: [Color] {
+        storableGradient.map { $0.color }
+    }
     
     /// Icon name for the story card
     var icon: String {
@@ -58,7 +63,7 @@ struct Story {
 // MARK: - Codable Support for Gradient Colors
 
 /// Represents RGB color components for storage
-struct StorableColor: Codable {
+struct StorableColor: Codable, Hashable {
     let red: Double
     let green: Double
     let blue: Double
@@ -74,38 +79,3 @@ struct StorableColor: Codable {
     }
 }
 
-extension Story {
-    /// Convert gradient colors to storable format
-    var storableGradient: [StorableColor] {
-        // Use predefined mappings based on story title
-        switch title {
-        case "Celebration":
-            return [StorableColor(red: 0.95, green: 0.6, blue: 0.35),
-                    StorableColor(red: 0.95, green: 0.5, blue: 0.65)]
-        case "Respect & Social Boundaries":
-            return [StorableColor(red: 0.6, green: 0.7, blue: 0.95),
-                    StorableColor(red: 0.75, green: 0.65, blue: 0.9)]
-        case "Food & Family":
-            return [StorableColor(red: 0.95, green: 0.85, blue: 0.35),
-                    StorableColor(red: 0.95, green: 0.7, blue: 0.45)]
-        case "Growing Up":
-            return [StorableColor(red: 0.4, green: 0.85, blue: 0.6),
-                    StorableColor(red: 0.45, green: 0.8, blue: 0.8)]
-        case "Loss & Remembrance":
-            return [StorableColor(red: 0.65, green: 0.45, blue: 0.85),
-                    StorableColor(red: 0.9, green: 0.5, blue: 0.65)]
-        case "Community & Joy":
-            return [StorableColor(red: 0.2, green: 0.75, blue: 0.4),
-                    StorableColor(red: 0.95, green: 0.85, blue: 0.2)]
-        case "Honoring Elders":
-            return [StorableColor(red: 0.85, green: 0.3, blue: 0.35),
-                    StorableColor(red: 0.95, green: 0.55, blue: 0.5)]
-        case "The Art of Hospitality":
-            return [StorableColor(red: 0.85, green: 0.5, blue: 0.2),
-                    StorableColor(red: 0.75, green: 0.35, blue: 0.25)]
-        default:
-            return [StorableColor(red: 0.95, green: 0.6, blue: 0.35),
-                    StorableColor(red: 0.95, green: 0.5, blue: 0.65)]
-        }
-    }
-}

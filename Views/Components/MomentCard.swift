@@ -10,6 +10,7 @@ import SwiftUI
 /// A card that displays a cultural story preview
 struct MomentCard: View {
     let story: Story
+    @EnvironmentObject var coordinator: NavigationCoordinator
     @EnvironmentObject var manager: ReflectionManager
     
     /// Whether this story has been completed
@@ -18,7 +19,9 @@ struct MomentCard: View {
     }
     
     var body: some View {
-        NavigationLink(destination: StoryReaderView(story: story)) {
+        Button(action: {
+            coordinator.push(.storyReader(story))
+        }) {
             HStack(spacing: 16) {
                 Image(systemName: story.icon)
                     .font(.system(size: 24))
