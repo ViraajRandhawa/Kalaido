@@ -9,7 +9,7 @@ import SwiftUI
 
 /// Onboarding flow with 3 introduction screens
 struct OnboardingView: View {
-    @Binding var showOnboarding: Bool
+    @EnvironmentObject var coordinator: NavigationCoordinator
     @State private var currentPage = 0
     
     private let pages: [(icon: String, title: String, description: String)] = [
@@ -68,7 +68,7 @@ struct OnboardingView: View {
                                 currentPage += 1
                             }
                         } else {
-                            showOnboarding = false
+                            coordinator.push(.chooseMoment)
                         }
                     }) {
                         Text(currentPage < pages.count - 1 ? "Continue" : "Get Started")
@@ -90,7 +90,7 @@ struct OnboardingView: View {
                     // Skip button (not on last page)
                     if currentPage < pages.count - 1 {
                         Button("Skip") {
-                            showOnboarding = false
+                            coordinator.push(.chooseMoment)
                         }
                         .font(.system(size: 16, weight: .regular))
                         .foregroundColor(KalaidoTheme.Colors.textSecondary)
@@ -146,5 +146,5 @@ struct OnboardingView: View {
 // MARK: - Preview
 
 #Preview {
-    OnboardingView(showOnboarding: .constant(true))
+    OnboardingView()
 }

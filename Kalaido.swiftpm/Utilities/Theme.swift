@@ -22,42 +22,95 @@ import SwiftUI
 enum KalaidoTheme {
     
     // MARK: - Colors
+    // MARK: - Colors
     enum Colors {
-        /// Primary text color - warm dark brown
-        static let textPrimary = Color(red: 0.2, green: 0.15, blue: 0.1)
+        // MARK: - Adaptive Helpers
+        private static func adaptiveColor(light: Color, dark: Color) -> Color {
+            Color(UIColor { traitCollection in
+                return traitCollection.userInterfaceStyle == .dark ? UIColor(dark) : UIColor(light)
+            })
+        }
         
-        /// Secondary text color - medium brown
-        static let textSecondary = Color(red: 0.4, green: 0.35, blue: 0.3)
+        // MARK: - Palette Definitions
         
-        /// Tertiary text color - light brown
-        static let textTertiary = Color(red: 0.5, green: 0.45, blue: 0.4)
+        // Text
+        /// Primary text color - Warm Dark Brown <-> Soft Cream
+        static let textPrimary = adaptiveColor(
+            light: Color(red: 0.2, green: 0.15, blue: 0.1),
+            dark: Color(red: 0.95, green: 0.94, blue: 0.90)
+        )
         
-        /// Primary background - warm cream
-        static let backgroundPrimary = Color(red: 0.96, green: 0.94, blue: 0.92)
+        /// Secondary text color - Medium Brown <-> Muted Cream
+        static let textSecondary = adaptiveColor(
+            light: Color(red: 0.4, green: 0.35, blue: 0.3),
+            dark: Color(red: 0.85, green: 0.82, blue: 0.78)
+        )
         
-        /// Secondary background - lighter cream
-        static let backgroundSecondary = Color(red: 0.98, green: 0.96, blue: 0.94)
+        /// Tertiary text color - Light Brown <-> Warm Gray
+        static let textTertiary = adaptiveColor(
+            light: Color(red: 0.5, green: 0.45, blue: 0.4),
+            dark: Color(red: 0.70, green: 0.68, blue: 0.64)
+        )
         
-        /// Card background
-        static let cardBackground = Color.white
+        // Backgrounds
+        /// Primary background - Warm Cream <-> Warm Charcoal
+        static let backgroundPrimary = adaptiveColor(
+            light: Color(red: 0.96, green: 0.94, blue: 0.92),
+            dark: Color(red: 0.15, green: 0.14, blue: 0.13)
+        )
         
-        /// Accent color - warm coral
-        static let accent = Color(red: 0.85, green: 0.55, blue: 0.45)
+        /// Secondary background - Lighter Cream <-> Slightly Lighter Charcoal
+        static let backgroundSecondary = adaptiveColor(
+            light: Color(red: 0.98, green: 0.96, blue: 0.94),
+            dark: Color(red: 0.18, green: 0.17, blue: 0.16)
+        )
         
-        /// Border color
-        static let border = Color(red: 0.8, green: 0.75, blue: 0.7)
+        /// Card background - White <-> Dark Cocoa
+        static let cardBackground = adaptiveColor(
+            light: Color.white,
+            dark: Color(red: 0.22, green: 0.20, blue: 0.18)
+        )
         
-        /// Muted icon color
-        static let iconMuted = Color(red: 0.7, green: 0.65, blue: 0.6)
-        
-        /// Progress track color
-        static let progressTrack = Color(red: 0.9, green: 0.88, blue: 0.86)
-        
-        /// Sidebar background
-        static let sidebarBackground = Color(red: 0.98, green: 0.97, blue: 0.95)
+        /// Sidebar background - Muted Cream <-> Dark Sidebar
+        static let sidebarBackground = adaptiveColor(
+            light: Color(red: 0.98, green: 0.97, blue: 0.95),
+            dark: Color(red: 0.13, green: 0.12, blue: 0.11)
+        )
         
         /// Image section background
-        static let imageBackground = Color(red: 0.97, green: 0.96, blue: 0.95)
+        static let imageBackground = adaptiveColor(
+            light: Color(red: 0.97, green: 0.96, blue: 0.95),
+            dark: Color(red: 0.16, green: 0.15, blue: 0.14)
+        )
+        
+        // Accents & Functional
+        
+        /// Accent color - Warm Coral (Maintained as it usually works well on both, or slightly tweaked)
+        static let accent = adaptiveColor(
+            light: Color(red: 0.85, green: 0.55, blue: 0.45),
+            dark: Color(red: 0.90, green: 0.60, blue: 0.50) // Slightly brighter for dark mode
+        )
+        
+        /// Border color
+        static let border = adaptiveColor(
+            light: Color(red: 0.8, green: 0.75, blue: 0.7),
+            dark: Color(red: 0.35, green: 0.33, blue: 0.30)
+        )
+        
+        /// Muted icon color
+        static let iconMuted = adaptiveColor(
+            light: Color(red: 0.7, green: 0.65, blue: 0.6),
+            dark: Color(red: 0.5, green: 0.48, blue: 0.45)
+        )
+        
+        /// Progress track color
+        static let progressTrack = adaptiveColor(
+            light: Color(red: 0.9, green: 0.88, blue: 0.86),
+            dark: Color(red: 0.25, green: 0.23, blue: 0.21)
+        )
+        
+        /// Static white for elements that must remain white (like text on images or accented buttons)
+        static let white = Color.white
     }
     
     // MARK: - Gradients

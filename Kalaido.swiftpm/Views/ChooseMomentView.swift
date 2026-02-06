@@ -21,7 +21,7 @@ struct ChooseMomentView: View {
                     .ignoresSafeArea()
                     .overlay {
                         ScrollView {
-                            VStack(alignment: .leading, spacing: 0) {
+                            VStack(alignment: .leading, spacing: 0) { // Keep VStack for the static header parts
                                 // Header
                                 VStack(alignment: .leading, spacing: 8) {
                                     Text("Choose a Moment")
@@ -37,33 +37,20 @@ struct ChooseMomentView: View {
                                 .padding(.top, 20)
                                 .padding(.bottom, 32)
                                 
-                                // Moment cards or empty state
-                                if StoryData.allStories.isEmpty {
-                                    VStack(spacing: 16) {
-                                        Image(systemName: "exclamationmark.triangle")
-                                            .font(.system(size: 48))
-                                            .foregroundColor(KalaidoTheme.Colors.textTertiary)
-                                        
-                                        Text("Unable to Load Stories")
-                                            .font(.system(size: 20, weight: .semibold))
-                                            .foregroundColor(KalaidoTheme.Colors.textPrimary)
-                                        
-                                        Text("Please check your app installation or try again.")
-                                            .font(.system(size: 16))
-                                            .foregroundColor(KalaidoTheme.Colors.textSecondary)
-                                            .multilineTextAlignment(.center)
-                                            .padding(.horizontal, 40)
-                                    }
-                                    .padding(.top, 60)
-                                } else {
-                                    VStack(spacing: 16) {
-                                        ForEach(StoryData.allStories, id: \.title) { story in
-                                            MomentCard(story: story)
+                                // Categorized Stories
+                                LazyVStack(alignment: .leading, spacing: 0, pinnedViews: [.sectionHeaders]) {
+                                    ForEach(StoryData.cultures) { culture in
+                                        Section(header: CultureSectionHeader(culture: culture)) {
+                                            ForEach(culture.stories) { story in
+                                                MomentCard(story: story)
+                                                    .padding(.horizontal, 24)
+                                                    .padding(.bottom, 16)
+                                            }
+                                            .padding(.top, 8)
                                         }
                                     }
-                                    .padding(.horizontal, 24)
-                                    .padding(.bottom, 32)
                                 }
+                                .padding(.bottom, 32)
                             }
                         }
                     }
@@ -108,4 +95,27 @@ struct ChooseMomentView: View {
     }
     .environmentObject(NavigationCoordinator())
     .environmentObject(ReflectionManager())
+}
+
+/// Header view for culture sections
+struct CultureSectionHeader: View {
+    let culture: Culture
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(culture.name)
+                .font(.system(size: 24, weight: .semibold, design: .serif))
+                .foregroundColor(KalaidoTheme.Colors.textPrimary)
+            
+            Text(culture.description)
+                .font(.system(size: 14, weight: .regular))
+                .foregroundColor(KalaidoTheme.Colors.textSecondary)
+                .lineLimit(1)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 24)
+        .padding(.vertical, 12)
+        .background(KalaidoTheme.Colors.backgroundPrimary) // Opaque background for sticky header
+        .accessibilityAddTraits(.isHeader)
+    }
 }

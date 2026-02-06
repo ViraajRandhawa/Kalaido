@@ -18,6 +18,7 @@ struct ReflectionView: View {
     @State private var selectedFeelings: Set<String> = []
     @State private var reflectionText: String = ""
     @State private var didSave = false // Trigger for haptic
+    @State private var isSaved = false // Trigger for UI feedback
     @FocusState private var isTextFieldFocused: Bool
     
     private let feelings = [
@@ -143,13 +144,13 @@ struct ReflectionView: View {
         }) {
             Text(feeling)
                 .font(.system(size: 15, weight: .medium))
-                .foregroundColor(selectedFeelings.contains(feeling) ? .white : KalaidoTheme.Colors.textSecondary)
+                .foregroundColor(selectedFeelings.contains(feeling) ? KalaidoTheme.Colors.white : KalaidoTheme.Colors.textSecondary)
                 .padding(.horizontal, 18)
                 .padding(.vertical, 10)
                 .background(
                     selectedFeelings.contains(feeling)
                     ? KalaidoTheme.horizontalGradient(story.colors)
-                    : LinearGradient(colors: [.white, .white], startPoint: .leading, endPoint: .trailing)
+                    : LinearGradient(colors: [KalaidoTheme.Colors.cardBackground, KalaidoTheme.Colors.cardBackground], startPoint: .leading, endPoint: .trailing)
                 )
                 .cornerRadius(20)
                 .overlay(
@@ -169,16 +170,27 @@ struct ReflectionView: View {
     
     private var saveButton: some View {
         Button(action: saveReflection) {
-            Text("Save Reflection")
-                .font(.system(size: 16, weight: .medium))
-                .foregroundColor(.white)
-                .frame(maxWidth: 280)
-                .padding(.vertical, 14)
-                .background(KalaidoTheme.horizontalGradient(story.colors))
-                .cornerRadius(KalaidoTheme.CornerRadius.pill)
+            HStack(spacing: 8) {
+                if isSaved {
+                    Image(systemName: "checkmark")
+                }
+                Text(isSaved ? "Saved!" : "Save Reflection")
+            }
+            .font(.system(size: 16, weight: .medium))
+            .foregroundColor(.white)
+            .frame(maxWidth: 280)
+            .padding(.vertical, 14)
+            .background(
+                isSaved
+                ? LinearGradient(colors: [Color.green.opacity(0.8), Color.green], startPoint: .leading, endPoint: .trailing)
+                : KalaidoTheme.horizontalGradient(story.colors)
+            )
+            .cornerRadius(KalaidoTheme.CornerRadius.pill)
+            .animation(.easeInOut(duration: 0.2), value: isSaved)
         }
-        .accessibilityLabel("Save reflection")
-        .accessibilityHint("Saves your feelings about this story and returns to home")
+        .disabled(isSaved)
+        .accessibilityLabel(isSaved ? "Saved" : "Save reflection")
+        .accessibilityHint(isSaved ? "Reflection saved" : "Saves your feelings about this story")
     }
     
     private func saveReflection() {
@@ -190,17 +202,36 @@ struct ReflectionView: View {
         
         // Trigger haptic via sensoryFeedback modifier
         didSave.toggle()
+        withAnimation {
+            isSaved = true
+        }
         
-        // Return to previous screen
-        coordinator.pop()
+        // Delay dismissal to show feedback
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+            // Return to previous screen (which may be story reader, so let's pop to root if saved)
+            // Actually user might want to read another story, so popToChooseMoment makes sense if we want to leave.
+            // But this specific button is "Save Reflection", usually it keeps you there or moves you?
+            // The previous code just popped. Let's stick to POP for "Save" but maybe the user stays?
+            // The request said: "make it so that the 'Read another story' button CONTEXT leads specifically to choose moment".
+            // It also said "fix that [dead button]...".
+            // Let's assume Save should just provide feedback.
+            // But usually after saving, you are "done".
+            // I'll keep the dismiss for now but with delay.
+            // Actually, wait, if we dismiss, the user goes back to the StoryReader.
+            // Ideally after reflection, you are done.
+            // Let's use popToChooseMoment() here too? No, maybe just stay on screen to let them hit "Read Another"?
+            // Or just pop.
+            // I will pop to ChooseMoment to complete the loop as "Done".
+             coordinator.popToChooseMoment()
+        }
     }
     
     // MARK: - Return Home Button
     
     private var returnHomeButton: some View {
         Button(action: {
-            // Pop back to root (ChooseMoment is the first view in the NavStack after Welcome)
-            coordinator.popToRoot()
+            // Pop back to ChooseMomentView (Dashboard)
+            coordinator.popToChooseMoment()
         }) {
             Text("Read Another Story")
                 .font(.system(size: 16, weight: .medium))

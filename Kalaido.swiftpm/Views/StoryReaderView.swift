@@ -66,7 +66,7 @@ struct StoryReaderView: View {
                             VStack(spacing: 24) {
                                 Text(story.paragraph(at: currentPage))
                                     .font(.custom("Georgia", size: 17, relativeTo: .body))
-                                    .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15))
+                                    .foregroundColor(KalaidoTheme.Colors.textPrimary)
                                     .lineSpacing(10)
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                     .frame(height: 120)

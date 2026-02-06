@@ -46,8 +46,25 @@ struct SidebarView: View {
                     .accessibilityLabel("Your Reflections")
                     .accessibilityHint("View your saved story reflections")
                     
-                    // Removed empty settings placeholder
-                    // Settings functionality can be added in a future update
+                    Button(action: {
+                        isOpen = false // Close sidebar first
+                        // Small delay to allow animation close
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                            // Find the coordinator from environment if possible, but Sidebar is usually in overlay.
+                            // SidebarView needs access to Coordinator.
+                             NotificationCenter.default.post(name: NSNotification.Name("OpenSettings"), object: nil)
+                        }
+                    }) {
+                         HStack(spacing: 16) {
+                            Image(systemName: "gearshape.fill")
+                                .font(.system(size: 20))
+                            Text("Settings")
+                                .font(.system(size: 18))
+                        }
+                        .foregroundColor(KalaidoTheme.Colors.textSecondary)
+                    }
+                    .accessibilityLabel("Settings")
+                    .accessibilityHint("Adjust app preferences and accessibility options")
                 }
                 
                 Spacer()

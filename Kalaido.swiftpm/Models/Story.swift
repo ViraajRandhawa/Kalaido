@@ -8,7 +8,8 @@
 import SwiftUI
 
 /// Represents a cultural story with its content and metadata
-struct Story: Codable, Hashable {
+struct Story: Codable, Hashable, Identifiable {
+    var id: String { title } // Use title as ID since it's unique enough for now
     let title: String
     let country: String
     let paragraphs: [String]

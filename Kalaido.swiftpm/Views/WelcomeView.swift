@@ -11,8 +11,6 @@ import SwiftUI
 struct WelcomeView: View {
     @EnvironmentObject var coordinator: NavigationCoordinator
     @StateObject private var reflectionManager = ReflectionManager()
-    @AppStorage("hasSeenOnboarding") private var hasSeenOnboarding = false
-    @State private var showOnboarding = false
     
     var body: some View {
         NavigationStack(path: $coordinator.path) {
@@ -27,7 +25,7 @@ struct WelcomeView: View {
                     // Logo
                     Image("logo")
                         .resizable()
-                        .frame(width: 120, height: 120)
+                        .frame(width: 200, height: 200)
                         .shadow(color: .black.opacity(0.1), radius: 20, x: 0, y: 10)
                         .accessibilityHidden(true)
                     
@@ -58,7 +56,7 @@ struct WelcomeView: View {
                     
                     // Begin button
                     Button(action: {
-                        coordinator.push(.chooseMoment)
+                        coordinator.push(.onboarding)
                     }) {
                         Text("Begin")
                             .font(.system(size: 18, weight: .medium))
@@ -82,24 +80,22 @@ struct WelcomeView: View {
             }
             .navigationDestination(for: Route.self) { route in
                 switch route {
+                case .onboarding:
+                    OnboardingView()
                 case .chooseMoment:
                     ChooseMomentView()
                 case .storyReader(let story):
                     StoryReaderView(story: story)
                 case .reflection(let story):
                     ReflectionView(story: story)
+                case .settings:
+                    SettingsView()
                 }
             }
         }
         .environmentObject(reflectionManager)
-        .fullScreenCover(isPresented: $showOnboarding) {
-            OnboardingView(showOnboarding: $showOnboarding)
-        }
-        .onAppear {
-            if !hasSeenOnboarding {
-                showOnboarding = true
-                hasSeenOnboarding = true
-            }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("OpenSettings"))) { _ in
+            coordinator.push(.settings)
         }
     }
 }
