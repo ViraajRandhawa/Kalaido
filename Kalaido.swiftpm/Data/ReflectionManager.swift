@@ -82,6 +82,12 @@ class ReflectionManager: ObservableObject {
         saveToDisk()
     }
     
+    /// Deletes a specific reflection entry
+    func deleteReflection(_ entry: ReflectionEntry) {
+        reflections.removeAll { $0.id == entry.id }
+        saveToDisk()
+    }
+    
     /// Clears all saved reflections
     func clearAllReflections() {
         reflections.removeAll()

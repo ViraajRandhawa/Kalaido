@@ -15,6 +15,8 @@ struct SettingsView: View {
     @AppStorage("hapticsEnabled") private var hapticsEnabled = true
     @AppStorage("highContrastEnabled") private var highContrastEnabled = false
     @AppStorage("reduceMotionEnabled") private var reduceMotionEnabled = false
+    @AppStorage("dyslexicFontEnabled") private var dyslexicFontEnabled = false
+    @AppStorage("fontSizeScale") private var fontSizeScale: Double = 1.0
     
     // Onboarding State
     @AppStorage("hasSeenOnboarding") private var hasSeenOnboarding = false
@@ -38,6 +40,40 @@ struct SettingsView: View {
                     .accessibilityAddTraits(.isHeader)
                 
                 List {
+                    // Typography Section
+                    Section(header: Text("Typography").foregroundColor(KalaidoTheme.Colors.textSecondary)) {
+                        Toggle("Dyslexic Friendly Font", isOn: $dyslexicFontEnabled)
+                            .toggleStyle(SwitchToggleStyle(tint: KalaidoTheme.Colors.accent))
+                            .accessibilityHint("Switches to a sans-serif font for better readability")
+                        
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Text Size")
+                                .font(.subheadline)
+                                .foregroundColor(KalaidoTheme.Colors.textPrimary)
+                            
+                            HStack {
+                                Text("A")
+                                    .font(.system(size: 14))
+                                Slider(value: $fontSizeScale, in: 0.8...1.4, step: 0.1)
+                                    .accentColor(KalaidoTheme.Colors.accent)
+                                Text("A")
+                                    .font(.system(size: 24))
+                            }
+                        }
+                        .padding(.vertical, 4)
+                        .accessibilityElement(children: .ignore)
+                        .accessibilityLabel("Text size adjustment")
+                        .accessibilityValue(String(format: "%.0f percent", fontSizeScale * 100))
+                        .accessibilityAdjustableAction { direction in
+                            if direction == .increment {
+                                fontSizeScale = min(fontSizeScale + 0.1, 1.4)
+                            } else {
+                                fontSizeScale = max(fontSizeScale - 0.1, 0.8)
+                            }
+                        }
+                    }
+                    .listRowBackground(KalaidoTheme.Colors.cardBackground.opacity(0.8))
+
                     // Accessibility Section
                     Section(header: Text("Accessibility").foregroundColor(KalaidoTheme.Colors.textSecondary)) {
                         Toggle("High Contrast", isOn: $highContrastEnabled)

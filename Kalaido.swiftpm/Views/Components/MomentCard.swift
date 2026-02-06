@@ -20,7 +20,10 @@ struct MomentCard: View {
     
     var body: some View {
         Button(action: {
-            coordinator.push(.storyReader(story))
+            // Find the culture this story belongs to
+            if let culture = StoryData.culture(for: story) {
+                coordinator.push(.storyReader(story, culture))
+            }
         }) {
             HStack(spacing: 16) {
                 Image(systemName: story.icon)
@@ -82,4 +85,5 @@ struct MomentCard: View {
         .padding()
     }
     .environmentObject(ReflectionManager())
+    .environmentObject(NavigationCoordinator())
 }

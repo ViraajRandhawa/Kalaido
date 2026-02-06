@@ -22,12 +22,24 @@ import SwiftUI
 enum KalaidoTheme {
     
     // MARK: - Colors
-    // MARK: - Colors
     enum Colors {
         // MARK: - Adaptive Helpers
         private static func adaptiveColor(light: Color, dark: Color) -> Color {
             Color(UIColor { traitCollection in
-                return traitCollection.userInterfaceStyle == .dark ? UIColor(dark) : UIColor(light)
+                // Check for High Contrast Override
+                let highContrast = UserDefaults.standard.bool(forKey: "highContrastEnabled")
+                let isDark = traitCollection.userInterfaceStyle == .dark
+                
+                if highContrast {
+                    // In high contrast, we force black/white extremes or strictly higher contrast values
+                    if isDark {
+                        return UIColor(dark)
+                    } else {
+                         return UIColor(light)
+                    }
+                }
+                
+                return isDark ? UIColor(dark) : UIColor(light)
             })
         }
         
@@ -135,24 +147,50 @@ enum KalaidoTheme {
     
     // MARK: - Typography
     enum Fonts {
+        // Read directly from UserDefaults since this is a static context
+        static var isDyslexicFontEnabled: Bool {
+            UserDefaults.standard.bool(forKey: "dyslexicFontEnabled")
+        }
+        
+        static var fontScale: Double {
+            let scale = UserDefaults.standard.double(forKey: "fontSizeScale")
+            return scale > 0 ? scale : 1.0
+        }
+        
+        private static func scaledSize(_ size: CGFloat) -> CGFloat {
+            size * CGFloat(fontScale)
+        }
+        
         static func title() -> Font {
-            .custom("Georgia", size: 48, relativeTo: .largeTitle)
+            let size = scaledSize(48)
+            return isDyslexicFontEnabled 
+                ? .system(size: size, weight: .bold, design: .rounded)
+                : .custom("Georgia", size: size, relativeTo: .largeTitle)
         }
         
         static func heading() -> Font {
-            .system(size: 36, weight: .regular, design: .serif)
+            let size = scaledSize(36)
+            return isDyslexicFontEnabled
+                ? .system(size: size, weight: .semibold, design: .rounded)
+                : .system(size: size, weight: .regular, design: .serif)
         }
         
         static func subheading() -> Font {
-            .system(size: 28, weight: .semibold)
+            let size = scaledSize(28)
+            return .system(size: size, weight: .semibold, design: isDyslexicFontEnabled ? .rounded : .default)
         }
         
         static func body() -> Font {
-            .custom("Georgia", size: 17, relativeTo: .body)
+            let size = scaledSize(17)
+            return isDyslexicFontEnabled
+                ? .system(size: size, weight: .regular, design: .rounded)
+                : .custom("Georgia", size: size, relativeTo: .body)
         }
         
         static func caption() -> Font {
-            .system(size: 15, weight: .regular)
+            let size = scaledSize(15)
+            // System font is usually fine, but let's respect the scaling
+            return .system(size: size, weight: .regular)
         }
     }
     

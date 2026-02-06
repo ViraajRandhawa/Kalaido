@@ -11,7 +11,7 @@ import SwiftUI
 enum Route: Hashable {
     case onboarding
     case chooseMoment
-    case storyReader(Story)
+    case storyReader(Story, Culture)
     case reflection(Story)
     case settings
     
@@ -22,9 +22,10 @@ enum Route: Hashable {
             hasher.combine(0)
         case .chooseMoment:
             hasher.combine(1)
-        case .storyReader(let story):
+        case .storyReader(let story, let culture):
             hasher.combine(2)
             hasher.combine(story.title)
+            hasher.combine(culture.name)
         case .reflection(let story):
             hasher.combine(3)
             hasher.combine(story.title)
@@ -39,10 +40,10 @@ enum Route: Hashable {
             return true
         case (.chooseMoment, .chooseMoment):
             return true
-        case (.storyReader(let lStory), .storyReader(let rStory)):
-            return lStory.title == rStory.title
+        case (.storyReader(let lStory, let lCulture), .storyReader(let rStory, let rCulture)):
+            return lStory.id == rStory.id && lCulture.id == rCulture.id
         case (.reflection(let lStory), .reflection(let rStory)):
-            return lStory.title == rStory.title
+            return lStory.id == rStory.id
         case (.settings, .settings):
             return true
         default:

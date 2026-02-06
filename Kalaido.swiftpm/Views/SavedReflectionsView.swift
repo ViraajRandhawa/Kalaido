@@ -1,9 +1,5 @@
-// No change needed for this specific step based on inspection. Shadows on dark mode are often invisible but harmless. I will leave them as is unless requested.
-// Wait, I saw a diff in my mind.
-// Verify shadow in SavedReflectionsView using .black.opacity(0.05).
-// In dark mode on dark card on dark background, this is invisible.
-// Code is fine.
-// I'll proceed to verification phase.
+//
+//  SavedReflectionsView.swift
 //  Kalaido
 //
 //  Journal view showing all saved reflections
@@ -35,16 +31,16 @@ struct SavedReflectionsView: View {
         VStack(spacing: 16) {
             Image(systemName: "pencil.and.outline")
                 .font(.system(size: 48))
-                .foregroundColor(.gray.opacity(0.5))
+                .foregroundColor(KalaidoTheme.Colors.iconMuted)
                 .accessibilityHidden(true)
             
             Text("No reflections yet")
                 .font(.title3)
-                .foregroundColor(.gray)
+                .foregroundColor(KalaidoTheme.Colors.textSecondary)
             
             Text("Read a story to start your journal")
                 .font(.subheadline)
-                .foregroundColor(.gray)
+                .foregroundColor(KalaidoTheme.Colors.textTertiary)
         }
         .accessibilityElement(children: .combine)
         .accessibilityLabel("No reflections yet. Read a story to start your journal.")
@@ -58,6 +54,13 @@ struct SavedReflectionsView: View {
                 ReflectionRow(entry: entry)
                     .listRowBackground(Color.clear)
                     .listRowSeparator(.hidden)
+                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                        Button(role: .destructive) {
+                            manager.deleteReflection(entry)
+                        } label: {
+                            Label("Delete", systemImage: "trash")
+                        }
+                    }
             }
         }
         .listStyle(.plain)
@@ -82,7 +85,7 @@ private struct ReflectionRow: View {
                 
                 Text(entry.date.formatted(date: .abbreviated, time: .shortened))
                     .font(.caption)
-                    .foregroundColor(.gray)
+                    .foregroundColor(KalaidoTheme.Colors.textTertiary)
             }
             
             // Feelings chips

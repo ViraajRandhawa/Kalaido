@@ -29,93 +29,100 @@ struct ReflectionView: View {
     
     var body: some View {
         if #available(iOS 17.0, *) {
-            ZStack {
-                KalaidoTheme.backgroundGradient
-                    .ignoresSafeArea()
-                
-                ScrollView {
-                    VStack(spacing: 24) {
-                        Spacer()
-                            .frame(height: 20)
-                        
-                        // Story indicator
-                        Circle()
-                            .fill(KalaidoTheme.horizontalGradient(story.colors))
-                            .frame(width: 20, height: 20)
-                            .accessibilityHidden(true)
-                        
-                        // Header text
-                        VStack(spacing: 16) {
-                            Text("Take a moment to sit with this story")
-                                .font(.system(size: 26, weight: .regular, design: .serif))
-                                .foregroundColor(KalaidoTheme.Colors.textPrimary)
-                                .multilineTextAlignment(.center)
-                                .accessibilityAddTraits(.isHeader)
-                            
-                            Text("What did you notice?")
-                                .font(.system(size: 17, weight: .regular))
-                                .foregroundColor(KalaidoTheme.Colors.textTertiary)
-                        }
-                        .padding(.horizontal, 40)
-                        
-                        Spacer()
-                            .frame(height: 32)
-                        
-                        // Feelings selection
-                        feelingsSection
-                        
-                        Spacer()
-                            .frame(height: 24)
-                        
-                        // Save button (only shown when feelings are selected)
-                        if !selectedFeelings.isEmpty || !reflectionText.isEmpty {
-                            saveButton
-                                .transition(.opacity)
-                        }
-                        
-                        Spacer()
-                            .frame(height: 16)
-                        
-                        // Return home button - proper pop to root
-                        returnHomeButton
-                        
-                        Spacer()
-                            .frame(height: 12)
-                        
-                        // Cultural context button
-                        Button(action: {
-                            withAnimation {
-                                showCulturalContext = true
-                            }
-                        }) {
-                            Text("Learn more about this moment")
-                                .font(.system(size: 15, weight: .regular))
-                                .foregroundColor(KalaidoTheme.Colors.textTertiary)
-                                .underline()
-                        }
-                        .accessibilityLabel("Learn more about this cultural moment")
-                        .accessibilityHint("Opens additional context about the \(story.country) culture")
-                        
-                        Spacer()
-                            .frame(height: 32)
-                    }
+            content
+                .sensoryFeedback(.success, trigger: didSave) { _, _ in
+                    UserDefaults.standard.bool(forKey: "hapticsEnabled")
                 }
-                .onTapGesture {
-                    isTextFieldFocused = false
-                }
-                
-                // Cultural context sheet
-                if showCulturalContext {
-                    culturalContextSheet
-                }
-            }
-            .sensoryFeedback(.success, trigger: didSave)
-            .navigationBarTitleDisplayMode(.inline)
+                .navigationBarTitleDisplayMode(.inline)
         } else {
-            // Fallback on earlier versions
+            content
+                .navigationBarTitleDisplayMode(.inline)
         }
     }
     
+    private var content: some View {
+        ZStack {
+            KalaidoTheme.backgroundGradient
+                .ignoresSafeArea()
+            
+            ScrollView {
+                VStack(spacing: 24) {
+                    Spacer()
+                        .frame(height: 20)
+                    
+                    // Story indicator
+                    Circle()
+                        .fill(KalaidoTheme.horizontalGradient(story.colors))
+                        .frame(width: 20, height: 20)
+                        .accessibilityHidden(true)
+                    
+                    // Header text
+                    VStack(spacing: 16) {
+                        Text("Take a moment to sit with this story")
+                            .font(.system(size: 26, weight: .regular, design: .serif))
+                            .foregroundColor(KalaidoTheme.Colors.textPrimary)
+                            .multilineTextAlignment(.center)
+                            .accessibilityAddTraits(.isHeader)
+                        
+                        Text("What did you notice?")
+                            .font(.system(size: 17, weight: .regular))
+                            .foregroundColor(KalaidoTheme.Colors.textTertiary)
+                    }
+                    .padding(.horizontal, 40)
+                    
+                    Spacer()
+                        .frame(height: 32)
+                    
+                    // Feelings selection
+                    feelingsSection
+                    
+                    Spacer()
+                        .frame(height: 24)
+                    
+                    // Save button (only shown when feelings are selected)
+                    if !selectedFeelings.isEmpty || !reflectionText.isEmpty {
+                        saveButton
+                            .transition(.opacity)
+                    }
+                    
+                    Spacer()
+                        .frame(height: 16)
+                    
+                    // Return home button - proper pop to root
+                    returnHomeButton
+                    
+                    Spacer()
+                        .frame(height: 12)
+                    
+                    // Cultural context button
+                    Button(action: {
+                        withAnimation {
+                            showCulturalContext = true
+                        }
+                    }) {
+                        Text("Learn more about this moment")
+                            .font(.system(size: 15, weight: .regular))
+                            .foregroundColor(KalaidoTheme.Colors.textTertiary)
+                            .underline()
+                    }
+                    .accessibilityLabel("Learn more about this cultural moment")
+                    .accessibilityHint("Opens additional context about the \(story.country) culture")
+                    
+                    Spacer()
+                        .frame(height: 32)
+                }
+            }
+            .onTapGesture {
+                isTextFieldFocused = false
+            }
+            
+            // Cultural context sheet
+            if showCulturalContext {
+                culturalContextSheet
+            }
+        }
+    }
+
     // MARK: - Feelings Section
     
     private var feelingsSection: some View {
@@ -208,20 +215,6 @@ struct ReflectionView: View {
         
         // Delay dismissal to show feedback
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
-            // Return to previous screen (which may be story reader, so let's pop to root if saved)
-            // Actually user might want to read another story, so popToChooseMoment makes sense if we want to leave.
-            // But this specific button is "Save Reflection", usually it keeps you there or moves you?
-            // The previous code just popped. Let's stick to POP for "Save" but maybe the user stays?
-            // The request said: "make it so that the 'Read another story' button CONTEXT leads specifically to choose moment".
-            // It also said "fix that [dead button]...".
-            // Let's assume Save should just provide feedback.
-            // But usually after saving, you are "done".
-            // I'll keep the dismiss for now but with delay.
-            // Actually, wait, if we dismiss, the user goes back to the StoryReader.
-            // Ideally after reflection, you are done.
-            // Let's use popToChooseMoment() here too? No, maybe just stay on screen to let them hit "Read Another"?
-            // Or just pop.
-            // I will pop to ChooseMoment to complete the loop as "Done".
              coordinator.popToChooseMoment()
         }
     }
@@ -263,7 +256,7 @@ struct ReflectionView: View {
                 
                 Text(story.culturalContext)
                     .font(.system(size: 16, weight: .regular))
-                    .foregroundColor(Color(red: 0.3, green: 0.25, blue: 0.2))
+                    .foregroundColor(KalaidoTheme.Colors.textSecondary)
                     .lineSpacing(6)
                 
                 Button(action: {

@@ -34,7 +34,7 @@ struct WelcomeView: View {
                     
                     // Title
                     Text("Kalaido")
-                        .font(.system(size: 48, weight: .regular, design: .serif))
+                        .font(KalaidoTheme.Fonts.title())
                         .foregroundColor(KalaidoTheme.Colors.textPrimary)
                         .accessibilityAddTraits(.isHeader)
                     
@@ -47,7 +47,7 @@ struct WelcomeView: View {
                         Text("from lives around the world")
                         Text("One story at a time")
                     }
-                    .font(.system(size: 17, weight: .regular))
+                    .font(KalaidoTheme.Fonts.body())
                     .foregroundColor(KalaidoTheme.Colors.textSecondary)
                     .multilineTextAlignment(.center)
                     
@@ -59,7 +59,7 @@ struct WelcomeView: View {
                         coordinator.push(.onboarding)
                     }) {
                         Text("Begin")
-                            .font(.system(size: 18, weight: .medium))
+                            .font(KalaidoTheme.Fonts.body().weight(.medium))
                             .foregroundColor(.white)
                             .frame(minWidth: 140, maxWidth: 200)
                             .frame(height: 50)
@@ -84,8 +84,8 @@ struct WelcomeView: View {
                     OnboardingView()
                 case .chooseMoment:
                     ChooseMomentView()
-                case .storyReader(let story):
-                    StoryReaderView(story: story)
+                case .storyReader(let story, let culture):
+                    StoryReaderView(story: story, culture: culture)
                 case .reflection(let story):
                     ReflectionView(story: story)
                 case .settings:
@@ -100,10 +100,9 @@ struct WelcomeView: View {
     }
 }
 
-// MARK: - Navigation Destinations (Removed in favor of Route enum in NavigationCoordinator.swift)
-
 // MARK: - Preview
 
 #Preview {
     WelcomeView()
+        .environmentObject(NavigationCoordinator())
 }
